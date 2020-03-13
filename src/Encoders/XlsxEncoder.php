@@ -17,6 +17,6 @@ class XlsxEncoder extends BaseSpoutEncoder
 
     protected function createWriter(): WriterAbstract
     {
-        return WriterEntityFactory::createXLSXWriter();
+        return WriterEntityFactory::createXLSXWriter()->setTempFolder($this->getCacheFolder());
     }
 }

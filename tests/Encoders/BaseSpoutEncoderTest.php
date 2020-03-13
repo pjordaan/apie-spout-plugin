@@ -32,7 +32,7 @@ class BaseSpoutEncoderTest extends TestCase
                 Argument::that(
                     function ($args) use (&$filename) {
                         $this->assertIsArray($args);
-                        $this->assertCount(2, $args);
+                        $this->assertCount(3, $args);
                         foreach ($args as $item) {
                             $this->assertInstanceOf(Row::class, $item);
                         }

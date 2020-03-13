@@ -4,6 +4,7 @@
 namespace W2w\Test\ApieSpoutPlugin;
 
 
+use erasys\OpenApi\Spec\v3\Reference;
 use PHPUnit\Framework\TestCase;
 use W2w\Lib\Apie\Apie;
 use W2w\Lib\Apie\Core\SearchFilters\SearchFilterRequest;
@@ -27,10 +28,14 @@ class ApieSpoutPluginTest extends TestCase
         $document = $apie->getOpenApiSpecGenerator()->getOpenApiSpec();
         foreach ($document->paths as $path) {
             if ($path->get) {
-                foreach (ApieSpoutPlugin::DATA as $key => $value) {
-                    $this->assertArrayHasKey($key, $path->get->responses);
+                foreach ($path->get->responses as $response) {
+                    if ($response instanceof Reference) {
+                        continue;
+                    }
+                    foreach (ApieSpoutPlugin::DATA as $key => $value) {
+                        $this->assertArrayHasKey($key, $response->content);
+                    }
                 }
-
             }
         }
     }

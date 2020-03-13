@@ -2,8 +2,10 @@
 namespace W2w\Lib\ApieSpoutPlugin;
 
 use erasys\OpenApi\Spec\v3\Document;
+use erasys\OpenApi\Spec\v3\MediaType;
 use erasys\OpenApi\Spec\v3\Operation;
 use erasys\OpenApi\Spec\v3\PathItem;
+use erasys\OpenApi\Spec\v3\Reference;
 use erasys\OpenApi\Spec\v3\Response;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
@@ -69,8 +71,13 @@ class ApieSpoutPlugin implements ApieAwareInterface, OpenApiEventProviderInterfa
         if (null === $operation) {
             return null;
         }
-        foreach (self::DATA as $contentType => $description) {
-            $operation->responses[$contentType] = new Response('Outputs ' . $description);
+        foreach ($operation->responses as &$response) {
+            if ($response instanceof Reference) {
+                continue;
+            }
+            foreach (self::DATA as $contentType => $description) {
+                $response->content[$contentType] = new MediaType([]);
+            }
         }
         return $operation;
     }

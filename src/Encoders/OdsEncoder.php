@@ -17,6 +17,6 @@ class OdsEncoder extends BaseSpoutEncoder
 
     protected function createWriter(): WriterAbstract
     {
-        return WriterEntityFactory::createODSWriter();
+        return WriterEntityFactory::createODSWriter()->setTempFolder($this->getCacheFolder());
     }
 }

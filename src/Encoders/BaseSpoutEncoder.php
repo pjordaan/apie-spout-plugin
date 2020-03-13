@@ -6,6 +6,7 @@ use Box\Spout\Writer\Common\Creator\WriterEntityFactory;
 use Box\Spout\Writer\WriterAbstract;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
+use W2w\Lib\ApieSpoutPlugin\Utils\FlattenedRowStructure;
 
 abstract class BaseSpoutEncoder implements EncoderInterface
 {
@@ -20,6 +21,10 @@ abstract class BaseSpoutEncoder implements EncoderInterface
 
     abstract protected function createWriter() :WriterAbstract;
 
+    final protected function getCacheFolder(): string
+    {
+        return $this->cacheFolder;
+    }
 
     /**
      * Encodes data into the given format.
@@ -32,13 +37,10 @@ abstract class BaseSpoutEncoder implements EncoderInterface
      *
      * @throws UnexpectedValueException
      */
-    public function encode($data, $format, array $context = [])
+    final public function encode($data, $format, array $context = [])
     {
         $filename = $this->cacheFolder . DIRECTORY_SEPARATOR . time() . '.' . $this->getFormat();
         $writer = $this->createWriter();
-        if (method_exists($writer, 'setTempFolder') && is_callable([$writer, 'setTempFolder'])) {
-            $writer = $writer->setTempFolder($this->cacheFolder);
-        }
         $writer
             ->openToFile($filename)
             ->addRows($this->toRowList($data));
@@ -52,7 +54,7 @@ abstract class BaseSpoutEncoder implements EncoderInterface
      */
     private function toRowList(array $data): array
     {
-        $list = $this->isList($data) ? $data : [$data];
+        $list = (new FlattenedRowStructure($this->isList($data) ? $data : [$data]))->toArray();
         $result = [];
         foreach ($list as $item) {
             $result[] = WriterEntityFactory::createRowFromArray($item)   ;
